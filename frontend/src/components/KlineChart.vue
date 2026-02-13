@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import * as echarts from 'echarts'
 
 const props = defineProps({
@@ -287,9 +287,23 @@ watch(() => [props.klineData, props.chanData], () => {
 }, { deep: true })
 
 // Handle window resize
-window.addEventListener('resize', () => {
+const handleResize = () => {
   if (chartInstance) {
     chartInstance.resize()
+  }
+}
+
+onMounted(() => {
+  nextTick(() => {
+    initChart()
+  })
+  window.addEventListener('resize', handleResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize)
+  if (chartInstance) {
+    chartInstance.dispose()
   }
 })
 </script>

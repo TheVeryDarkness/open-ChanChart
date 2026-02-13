@@ -4,6 +4,15 @@ from app.models.stock_model import KlineData
 from app.models.chan_model import Fractal, Pen, Segment, ZhongShu
 
 
+def is_kline_contained(k1: KlineData, k2: KlineData) -> bool:
+    """
+    判断两根K线是否存在包含关系
+    包含关系：一根K线的高低点完全包含另一根K线，或被另一根K线包含
+    """
+    return (k1.high <= k2.high and k1.low >= k2.low) or \
+           (k1.high >= k2.high and k1.low <= k2.low)
+
+
 def process_inclusion(klines: List[KlineData]) -> List[KlineData]:
     """
     处理K线包含关系
@@ -21,10 +30,7 @@ def process_inclusion(klines: List[KlineData]) -> List[KlineData]:
         prev = processed[-1]
         
         # 判断是否存在包含关系
-        is_contained = (current.high <= prev.high and current.low >= prev.low) or \
-                      (current.high >= prev.high and current.low <= prev.low)
-        
-        if not is_contained:
+        if not is_kline_contained(current, prev):
             # 无包含关系，确定方向
             if current.high > prev.high:
                 direction = 'up'
