@@ -1,5 +1,35 @@
 # ChanChart - 缠论股票图表可视化系统
 
+[![Demo Status](https://img.shields.io/badge/demo-working-brightgreen.svg)](https://github.com/LGAG/open-ChanChart)
+
+## 🎉 Demo Available!
+
+A working prototype is now available! See [SETUP.md](SETUP.md) for installation and usage instructions.
+
+### Demo Screenshots
+
+**Main Interface:**
+![Initial View](https://github.com/user-attachments/assets/74e2a9c8-7a79-4230-83da-2a3ec5243f7d)
+
+**Chan Theory Visualization:**
+![Chart with Data](https://github.com/user-attachments/assets/498a3acd-32b0-4cb1-9729-a28d742203a1)
+
+### Quick Start
+
+```bash
+# Start backend
+cd backend
+pip install -r requirements.txt
+python run.py
+
+# Start frontend (in another terminal)
+cd frontend
+npm install
+npm run dev
+```
+
+Then open http://localhost:5173 in your browser.
+
 ## 一、项目核心需求
 实现股票K线与缠论核心结构（笔、段、中枢）的可视化展示，支持股票选择、周期切换、缠论参数配置，提供清晰的缠论结构数据查询接口。
 
