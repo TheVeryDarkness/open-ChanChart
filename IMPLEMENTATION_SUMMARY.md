@@ -202,6 +202,7 @@ All security vulnerabilities have been addressed:
 - No database persistence
 - No user authentication
 - No data caching (Redis not implemented)
+- **Zhongshu indices refer to processed K-lines**: When inclusion processing is enabled, zhongshu `start_index` and `end_index` may not align with the original K-line data returned to the frontend. This is a known issue that should use date-based boundaries in production.
 
 ### Recommended Enhancements
 1. **Data Integration**
