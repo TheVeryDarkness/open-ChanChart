@@ -1,10 +1,8 @@
 """股票数据API接口"""
-from fastapi import APIRouter, Query, HTTPException
-from typing import List, Optional
+from fastapi import APIRouter, Query
+from typing import Optional
 from datetime import datetime, timedelta
 import random
-
-from app.models.stock_model import StockInfo, KlineData
 
 router = APIRouter(prefix="/api/stock", tags=["stock"])
 

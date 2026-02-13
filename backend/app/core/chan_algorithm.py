@@ -1,5 +1,5 @@
 """缠论核心算法实现"""
-from typing import List, Tuple
+from typing import List
 from app.models.stock_model import KlineData
 from app.models.chan_model import Fractal, Pen, Segment, ZhongShu
 
@@ -152,6 +152,7 @@ def generate_segments(pens: List[Pen]) -> List[Segment]:
     
     segments = []
     segment_pens = [pens[0]]
+    segment_start_idx = 0
     
     for i in range(1, len(pens)):
         if pens[i].direction == segment_pens[-1].direction:
@@ -159,18 +160,19 @@ def generate_segments(pens: List[Pen]) -> List[Segment]:
         else:
             if len(segment_pens) >= 3:
                 segments.append(Segment(
-                    start_index=0,
-                    end_index=len(segment_pens) - 1,
+                    start_index=segment_start_idx,
+                    end_index=segment_start_idx + len(segment_pens) - 1,
                     pens=segment_pens,
                     direction=segment_pens[0].direction
                 ))
+            segment_start_idx = i
             segment_pens = [pens[i]]
     
     # 处理最后一段
     if len(segment_pens) >= 3:
         segments.append(Segment(
-            start_index=0,
-            end_index=len(segment_pens) - 1,
+            start_index=segment_start_idx,
+            end_index=segment_start_idx + len(segment_pens) - 1,
             pens=segment_pens,
             direction=segment_pens[0].direction
         ))

@@ -3,7 +3,6 @@ from fastapi import APIRouter, Query, HTTPException
 from typing import Optional
 
 from app.models.stock_model import KlineData
-from app.models.chan_model import ChanData
 from app.core.chan_algorithm import calculate_chan_data
 from app.api.stock import get_kline_data
 
@@ -51,10 +50,10 @@ async def get_chan_analysis(
             "period": period,
             "klines": klines_data,
             "chan": {
-                "fractals": [f.dict() for f in chan_result["fractals"]],
-                "pens": [p.dict() for p in chan_result["pens"]],
-                "segments": [s.dict() for s in chan_result["segments"]],
-                "zhongshus": [z.dict() for z in chan_result["zhongshus"]]
+                "fractals": [f.model_dump() for f in chan_result["fractals"]],
+                "pens": [p.model_dump() for p in chan_result["pens"]],
+                "segments": [s.model_dump() for s in chan_result["segments"]],
+                "zhongshus": [z.model_dump() for z in chan_result["zhongshus"]]
             }
         }
     }

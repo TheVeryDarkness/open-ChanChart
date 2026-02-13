@@ -42,18 +42,13 @@ const updateChart = () => {
   ])
   const volumes = props.klineData.map(item => item.volume)
 
-  // Prepare Chan theory data
-  const penLines = []
+  // Prepare Chan theory data - pen lines as segments
+  const penLineData = []
   if (props.chanData.pens) {
     props.chanData.pens.forEach(pen => {
-      penLines.push({
-        xAxis: pen.start_date,
-        yAxis: pen.start_price
-      })
-      penLines.push({
-        xAxis: pen.end_date,
-        yAxis: pen.end_price
-      })
+      penLineData.push([pen.start_date, pen.start_price])
+      penLineData.push([pen.end_date, pen.end_price])
+      penLineData.push([null, null]) // Break line between pens
     })
   }
 
@@ -231,17 +226,18 @@ const updateChart = () => {
   }
 
   // Add pen lines
-  if (penLines.length > 0) {
+  if (penLineData.length > 0) {
     option.series.push({
       name: '笔',
       type: 'line',
-      data: penLines,
+      data: penLineData,
       lineStyle: {
         color: '#0000FF',
         width: 2
       },
       symbol: 'circle',
-      symbolSize: 6
+      symbolSize: 6,
+      connectNulls: false
     })
   }
 
@@ -275,12 +271,6 @@ const updateChart = () => {
 
   chartInstance.setOption(option, true)
 }
-
-onMounted(() => {
-  nextTick(() => {
-    initChart()
-  })
-})
 
 watch(() => [props.klineData, props.chanData], () => {
   updateChart()
