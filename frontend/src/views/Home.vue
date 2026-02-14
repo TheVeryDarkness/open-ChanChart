@@ -1,0 +1,166 @@
+<template>
+  <div class="home">
+    <el-card class="control-panel">
+      <h2>缠论股票图表可视化系统</h2>
+      
+      <div class="controls">
+        <div class="control-item">
+          <label>选择股票：</label>
+          <StockSelector @change="handleStockChange" />
+        </div>
+
+        <div class="control-item">
+          <label>选择周期：</label>
+          <el-radio-group v-model="period" @change="loadData">
+            <el-radio-button label="D">日K</el-radio-button>
+            <el-radio-button label="30F" disabled>30分</el-radio-button>
+            <el-radio-button label="5F" disabled>5分</el-radio-button>
+          </el-radio-group>
+        </div>
+
+        <div class="control-item">
+          <label>包含关系处理：</label>
+          <el-switch v-model="processInclude" @change="loadData" />
+        </div>
+
+        <div class="control-item">
+          <el-button type="primary" @click="loadData" :loading="loading">
+            刷新数据
+          </el-button>
+        </div>
+      </div>
+
+      <div class="info" v-if="currentStock">
+        <el-tag>{{ currentStock.code }} - {{ currentStock.name }}</el-tag>
+        <el-tag type="info" style="margin-left: 10px">{{ currentStock.market === 'sh' ? '上海' : '深圳' }}</el-tag>
+      </div>
+    </el-card>
+
+    <el-card class="chart-panel" v-loading="loading">
+      <KlineChart 
+        v-if="klineData.length > 0"
+        :klineData="klineData"
+        :chanData="chanData"
+      />
+      <el-empty v-else description="请选择股票查看图表" />
+    </el-card>
+
+    <el-card class="stats-panel" v-if="chanData.pens">
+      <h3>缠论数据统计</h3>
+      <el-row :gutter="20">
+        <el-col :span="6">
+          <el-statistic title="分型数量" :value="chanData.fractals?.length || 0" />
+        </el-col>
+        <el-col :span="6">
+          <el-statistic title="笔数量" :value="chanData.pens?.length || 0" />
+        </el-col>
+        <el-col :span="6">
+          <el-statistic title="段数量" :value="chanData.segments?.length || 0" />
+        </el-col>
+        <el-col :span="6">
+          <el-statistic title="中枢数量" :value="chanData.zhongshus?.length || 0" />
+        </el-col>
+      </el-row>
+    </el-card>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import KlineChart from '../components/KlineChart.vue'
+import StockSelector from '../components/StockSelector.vue'
+import { getChanAnalysis } from '../api/chan'
+
+const currentStock = ref(null)
+const period = ref('D')
+const processInclude = ref(true)
+const loading = ref(false)
+const klineData = ref([])
+const chanData = ref({})
+
+const handleStockChange = (stock) => {
+  currentStock.value = stock
+  loadData()
+}
+
+const loadData = async () => {
+  if (!currentStock.value) {
+    ElMessage.warning('请先选择股票')
+    return
+  }
+
+  loading.value = true
+  try {
+    const params = {
+      code: currentStock.value.code,
+      market: currentStock.value.market,
+      period: period.value,
+      process_include: processInclude.value
+    }
+
+    const response = await getChanAnalysis(params)
+    
+    if (response.code === 200) {
+      klineData.value = response.data.klines
+      chanData.value = response.data.chan
+      ElMessage.success('数据加载成功')
+    } else {
+      ElMessage.error('数据加载失败')
+    }
+  } catch (error) {
+    ElMessage.error('请求失败：' + error.message)
+  } finally {
+    loading.value = false
+  }
+}
+</script>
+
+<style scoped>
+.home {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.control-panel {
+  margin-bottom: 20px;
+}
+
+.control-panel h2 {
+  margin: 0 0 20px 0;
+  color: #409eff;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.control-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.control-item label {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.info {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.chart-panel {
+  margin-bottom: 20px;
+}
+
+.stats-panel h3 {
+  margin: 0 0 20px 0;
+}
+</style>
