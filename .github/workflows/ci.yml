@@ -34,7 +34,7 @@ jobs:
     - name: Start backend server (smoke test)
       working-directory: ./backend
       run: |
-        timeout 10 python run.py || true
+        timeout 10 python run.py
         
   frontend:
     name: Frontend Tests
